@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="post-detail-container">
+
+    <!-- Navigation link -->
+    <a href="{{ url_for('index') }}" class="back-nav-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Back to Index</span>
+    </a>
+
+    <!-- Article Document -->
+    <article class="post-article">
+
+      <header class="post-header">
+        <div class="post-header-badges">
+          {% if post.category %}
+            <a class="badge badge-category" href="{{ url_for('category', name=post.category) }}">
+              {{ post.category }}
+            </a>
+          {% endif %}
+          <span class="badge badge-time">
+            {{ post.body | reading_time }} min read
+          </span>
+          {% if session.logged_in %}
+            <a class="badge badge-edit" href="{{ url_for('admin_edit', slug=post.slug) }}">
+              Edit Post
+            </a>
+          {% endif %}
+        </div>
+
+        <h1 class="post-main-title">{{ post.title }}</h1>
+
+        <div class="post-meta-row">
+          <div class="post-meta-item">
+            <span style="color:var(--text-faint);">Author</span>
+            <strong style="color:var(--text-main);margin-left:4px;">{{ post.author }}</strong>
+          </div>
+          <span class="meta-separator">&bull;</span>
+          <div class="post-meta-item">
+            <time datetime="{{ post.created_at.strftime('%Y-%m-%d') }}">
+              {{ post.created_at.strftime('%B %d, %Y') }}
+            </time>
+          </div>
+        </div>
+
+        {% if post.tags %}
+          <div class="post-tags-list">
+            {% for t in post.tags %}
+              <a class="badge badge-tag" href="{{ url_for('tag', name=t) }}">#{{ t }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </header>
+
+      <!-- Markdown Content -->
+      <div class="markdown-content">
+        {{ post.rendered_body | safe }}
+      </div>
+
+      <!-- Post End Nav -->
+      <footer class="post-footer-nav">
+        <div class="post-author-box">
+          <div class="author-avatar">{{ (post.author or 'A')[0].upper() }}</div>
+          <div>
+            <div style="font-weight:600;font-size:0.92rem;color:var(--text-main);">{{ post.author }}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Engineering Contributor</div>
+          </div>
+        </div>
+
+        <!-- Adjacent Posts -->
+        {% if prev_post or next_post %}
+          <div class="post-navigation-grid">
+            {% if prev_post %}
+              <a class="post-nav-card" href="{{ url_for('post', slug=prev_post.slug) }}">
+                <span class="nav-label-sub">&larr; Previous</span>
+                <span class="nav-title-sub">{{ prev_post.title }}</span>
+              </a>
+            {% else %}
+              <div></div>
+            {% endif %}
+
+            {% if next_post %}
+              <a class="post-nav-card" style="text-align:right;" href="{{ url_for('post', slug=next_post.slug) }}">
+                <span class="nav-label-sub">Next &rarr;</span>
+                <span class="nav-title-sub">{{ next_post.title }}</span>
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </footer>
+
+    </article>
+
+  </div>
+</main>
+{% endblock %}

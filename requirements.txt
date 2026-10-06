@@ -1,0 +1,6 @@
+flask==2.3.3
+pymongo>=4.6
+markdown>=3.5
+python-dotenv>=1.0
+flask-wtf>=1.2
+    claude --resume 8ca65c3d-ba7b-47ed-b549-10016a14d11e

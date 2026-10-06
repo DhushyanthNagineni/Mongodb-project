@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if post else 'Create' }} Article{% endblock %}
+
+{% block content %}
+<main class="container" style="max-width:880px;padding-top:40px;padding-bottom:60px;">
+
+  <!-- Header Navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="back-nav-link">
+      &larr; Back to Console
+    </a>
+
+    {% if post %}
+      <a href="{{ url_for('post', slug=post.slug) }}" class="btn btn-secondary btn-sm" target="_blank">
+        <span>View Live Article &rarr;</span>
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="form-card">
+    <h1 class="hero-title" style="font-size:1.6rem;margin-bottom:24px;">
+      {{ 'Edit' if post else 'Compose' }} Article
+    </h1>
+
+    <form method="post"
+          action="{{ url_for('admin_edit', slug=post.slug) if post else url_for('admin_new') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label" for="title">
+          <span>Article Title *</span>
+        </label>
+        <input id="title" class="form-input" name="title" type="text" required
+               placeholder="e.g. Distributed Consensus: Raft Protocol Implementation"
+               value="{{ post.title if post else '' }}">
+      </div>
+
+      <!-- Category and Tags -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="form-group">
+          <label class="form-label" for="category">
+            <span>Discipline</span>
+          </label>
+          <input id="category" class="form-input" name="category" type="text" list="category-list"
+                 placeholder="e.g. Systems"
+                 value="{{ post.category if post else '' }}">
+          <datalist id="category-list">
+            {% for c in nav_categories %}
+              <option value="{{ c }}"></option>
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="tags">
+            <span>Topics <span style="font-weight:400;color:var(--text-faint);">(comma-separated)</span></span>
+          </label>
+          <input id="tags" class="form-input" name="tags" type="text"
+                 placeholder="concurrency, performance, database"
+                 value="{{ post.tags | join(', ') if post and post.tags else '' }}">
+        </div>
+      </div>
+
+      <!-- Markdown Editor with Live Preview -->
+      <div class="form-group">
+        <div class="editor-tabs">
+          <div class="tab-buttons">
+            <button id="tab-write" type="button" class="tab-btn active">Markdown</button>
+            <button id="tab-preview" type="button" class="tab-btn">Preview</button>
+          </div>
+
+          <div class="editor-toolbar">
+            <button class="tool-btn" type="button" data-format="bold" title="Bold">B</button>
+            <button class="tool-btn" type="button" data-format="italic" title="Italic">I</button>
+            <button class="tool-btn" type="button" data-format="heading" title="Heading">H</button>
+            <button class="tool-btn" type="button" data-format="quote" title="Quote">&rdquo;</button>
+            <button class="tool-btn" type="button" data-format="code" title="Code block">&lt;&gt;</button>
+            <button class="tool-btn" type="button" data-format="link" title="Link">URL</button>
+            <button class="tool-btn" type="button" data-format="list" title="List">&bull;</button>
+          </div>
+        </div>
+
+        <textarea id="body" class="form-textarea" name="body"
+                  placeholder="Compose technical essay in Markdown format...">{{ post.body if post else '' }}</textarea>
+
+        <!-- Live Preview Output -->
+        <div id="markdown-preview-pane"></div>
+      </div>
+
+      <!-- Publish State -->
+      <div class="form-group" style="margin-top:24px;">
+        <label class="toggle-switch">
+          <input type="checkbox" name="is_published"
+                 {% if not post or post.is_published %}checked{% endif %}>
+          <div class="switch-slider"></div>
+          <div>
+            <div style="font-weight:600;font-size:0.88rem;color:var(--text-main);">Publish Immediately</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">Uncheck to stage as a private draft.</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+        <button class="btn btn-primary" type="submit">
+          <span>Save Entry</span>
+        </button>
+        <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">
+          <span>Cancel</span>
+        </a>
+      </div>
+
+    </form>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Discipline: {{ name }}{% endblock %}
+
+{% block content %}
+<main class="container">
+
+  <!-- Header Banner -->
+  <section class="hero-section" style="padding:48px 0 28px;">
+    <div style="margin-bottom:14px;">
+      <a href="{{ url_for('index') }}" class="back-nav-link">&larr; Back to Index</a>
+    </div>
+
+    <div class="hero-kicker">
+      <span>Discipline</span>
+    </div>
+
+    <h1 class="hero-title" style="margin-bottom:10px;">
+      {{ name }}
+    </h1>
+
+    <p class="hero-subtitle">
+      Articles categorized under the {{ name }} engineering domain.
+    </p>
+
+    <!-- Search in Category -->
+    <div class="search-wrapper">
+      <div class="search-bar">
+        <span class="search-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input id="post-search-input" class="search-input" type="text"
+               placeholder="Filter {{ name }} entries..." autocomplete="off">
+        <button id="search-clear-btn" class="search-clear-btn" type="button" aria-label="Clear">&times;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Grid -->
+  <div class="content-grid-layout">
+
+    <div class="content-main">
+      <div id="search-empty-msg" class="empty-state" style="display:none;margin-bottom:24px;">
+        <h3 style="font-size:1.15rem;margin-bottom:6px;font-weight:600;">No matching entries in {{ name }}</h3>
+        <p style="color:var(--text-muted);font-size:0.88rem;">Adjust your search keyword.</p>
+      </div>
+
+      {% if posts %}
+        <div class="posts-feed">
+          {% for p in posts %}
+            <article class="post-card">
+              <div class="card-top-meta">
+                <div class="card-badges">
+                  <span class="badge badge-category">{{ name }}</span>
+                  <span class="badge badge-time">{{ p.body | reading_time }} min read</span>
+                </div>
+                <time class="card-date" datetime="{{ p.created_at.strftime('%Y-%m-%d') }}">
+                  {{ p.created_at.strftime('%B %d, %Y') }}
+                </time>
+              </div>
+
+              <a class="post-title-link" href="{{ url_for('post', slug=p.slug) }}">
+                <h2 class="card-title">{{ p.title }}</h2>
+              </a>
+
+              <p class="card-excerpt">
+                {{ p.body | excerpt(170) }}
+              </p>
+
+              <div class="card-bottom-bar">
+                <div class="author-chip">
+                  <span class="author-name">{{ p.author }}</span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:14px;">
+                  {% if p.tags %}
+                    <div style="display:flex;gap:6px;">
+                      {% for t in p.tags[:2] %}
+                        <a class="badge badge-tag" href="{{ url_for('tag', name=t) }}">#{{ t }}</a>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  <a class="read-more-btn" href="{{ url_for('post', slug=p.slug) }}">
+                    <span>Read</span>
+                    <span class="arrow-icon">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3 style="font-size:1.15rem;margin-bottom:6px;font-weight:600;">No articles in this category</h3>
+          <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:16px;">Check back later or view all articles.</p>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('index') }}">View Index</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="content-sidebar">
+      {% if nav_categories %}
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <span>Disciplines</span>
+          </div>
+          <ul class="category-list">
+            {% for c in nav_categories %}
+              <li class="category-list-item">
+                <a href="{{ url_for('category', name=c) }}"
+                   style="{% if c == name %}color:var(--text-main);font-weight:600;background:var(--surface-hover);{% endif %}">
+                  <span>{{ c }}</span>
+                  <span class="category-arrow">&rarr;</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if nav_tags %}
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <span>Topics</span>
+          </div>
+          <div class="tag-cloud">
+            {% for t in nav_tags %}
+              <a class="badge badge-tag" href="{{ url_for('tag', name=t) }}">#{{ t }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </aside>
+
+  </div>
+
+</main>
+{% endblock %}

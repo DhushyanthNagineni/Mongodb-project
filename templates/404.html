@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Resource Not Found (404){% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="auth-container">
+    <div class="empty-state" style="max-width:480px;padding:48px 36px;">
+      <div style="font-family:var(--font-mono);font-size:3.5rem;font-weight:700;color:var(--text-muted);line-height:1;margin-bottom:16px;">
+        404
+      </div>
+      <h2 style="font-size:1.3rem;margin-bottom:8px;font-weight:600;">Resource Not Found</h2>
+      <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:24px;">
+        The requested document does not exist, has been relocated, or is restricted to private staging.
+      </p>
+      <div style="display:flex;justify-content:center;gap:10px;">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('index') }}">
+          <span>&larr; Return to Index</span>
+        </a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('login') }}">
+          <span>Console</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

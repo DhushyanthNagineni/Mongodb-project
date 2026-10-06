@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Technical Journal &amp; Engineering Essays{% endblock %}
+
+{% block content %}
+<main class="container">
+
+  <!-- Editorial Hero Section -->
+  <section class="hero-section">
+    <div class="hero-kicker">
+      <span class="hero-kicker-dot"></span>
+      <span>Engineering Publications</span>
+    </div>
+
+    <h1 class="hero-title">
+      Perspectives on Distributed Systems, <br>
+      <span class="gradient-text">Architecture &amp; Performance</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      A curated collection of technical essays on concurrency, data structures, and infrastructure engineering.
+    </p>
+
+    <!-- Refined Search Bar -->
+    <div class="search-wrapper">
+      <div class="search-bar">
+        <span class="search-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input id="post-search-input" class="search-input" type="text"
+               placeholder="Search articles by title, tag, or topic..." autocomplete="off">
+        <span class="search-shortcut">⌘ K</span>
+        <button id="search-clear-btn" class="search-clear-btn" type="button" aria-label="Clear query">&times;</button>
+      </div>
+    </div>
+
+    <!-- Category Filter Chips -->
+    <div class="filter-chips-container">
+      <a href="{{ url_for('index') }}" class="filter-chip active">
+        <span>All Articles ({{ total_published_count }})</span>
+      </a>
+      {% for c in nav_categories %}
+        <a href="{{ url_for('category', name=c) }}" class="filter-chip">
+          <span>{{ c }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Content Layout -->
+  <div class="content-grid-layout">
+
+    <!-- Articles Feed -->
+    <div class="content-main">
+      <div id="search-empty-msg" class="empty-state" style="display:none;margin-bottom:24px;">
+        <div class="empty-state-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <h3 style="font-size:1.15rem;margin-bottom:6px;font-weight:600;">No matching entries</h3>
+        <p style="color:var(--text-muted);font-size:0.88rem;">Try searching with broader terms or clear the filter.</p>
+      </div>
+
+      {% if posts %}
+        <div class="posts-feed">
+          {% for p in posts %}
+            <article class="post-card">
+              <div class="card-top-meta">
+                <div class="card-badges">
+                  {% if p.category %}
+                    <a class="badge badge-category" href="{{ url_for('category', name=p.category) }}">
+                      {{ p.category }}
+                    </a>
+                  {% endif %}
+                  <span class="badge badge-time">
+                    {{ p.body | reading_time }} min read
+                  </span>
+                </div>
+                <time class="card-date" datetime="{{ p.created_at.strftime('%Y-%m-%d') }}">
+                  {{ p.created_at.strftime('%B %d, %Y') }}
+                </time>
+              </div>
+
+              <a class="post-title-link" href="{{ url_for('post', slug=p.slug) }}">
+                <h2 class="card-title">{{ p.title }}</h2>
+              </a>
+
+              <p class="card-excerpt">
+                {{ p.body | excerpt(170) }}
+              </p>
+
+              <div class="card-bottom-bar">
+                <div class="author-chip">
+                  <span class="author-name">{{ p.author }}</span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:14px;">
+                  {% if p.tags %}
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      {% for t in p.tags[:2] %}
+                        <a class="badge badge-tag" href="{{ url_for('tag', name=t) }}">#{{ t }}</a>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  <a class="read-more-btn" href="{{ url_for('post', slug=p.slug) }}">
+                    <span>Read</span>
+                    <span class="arrow-icon">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <h3 style="font-size:1.15rem;margin-bottom:6px;font-weight:600;">No articles published</h3>
+          <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:18px;">No entries have been published to the repository yet.</p>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('login') }}">Access Console</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Editorial Sidebar -->
+    <aside class="content-sidebar">
+
+      <!-- Categories Widget -->
+      {% if nav_categories %}
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <span>Disciplines</span>
+          </div>
+          <ul class="category-list">
+            {% for c in nav_categories %}
+              <li class="category-list-item">
+                <a href="{{ url_for('category', name=c) }}">
+                  <span>{{ c }}</span>
+                  <span class="category-arrow">&rarr;</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Tags Widget -->
+      {% if nav_tags %}
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <span>Topics</span>
+          </div>
+          <div class="tag-cloud">
+            {% for t in nav_tags %}
+              <a class="badge badge-tag" href="{{ url_for('tag', name=t) }}">#{{ t }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- System Telemetry Note -->
+      <div class="sidebar-widget system-status-widget">
+        <div class="system-status-header">
+          <span class="status-pulse-dot"></span>
+          <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);">Repository Operational</span>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;">
+          Persistence engine active. Document indexing and queries are synchronized directly via atomic pipelines.
+        </p>
+      </div>
+
+    </aside>
+
+  </div>
+
+</main>
+{% endblock %}
